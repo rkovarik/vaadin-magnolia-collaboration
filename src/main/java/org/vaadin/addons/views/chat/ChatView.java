@@ -1,6 +1,7 @@
-package com.example.application.views.chat;
+package org.vaadin.addons.views.chat;
 
-import com.example.application.views.MainLayout;
+import java.util.UUID;
+
 import com.vaadin.collaborationengine.CollaborationMessageInput;
 import com.vaadin.collaborationengine.CollaborationMessageList;
 import com.vaadin.collaborationengine.UserInfo;
@@ -8,11 +9,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import java.util.UUID;
 
 @PageTitle("Chat")
-@Route(value = "", layout = MainLayout.class)
+//@Route(value = "", layout = MainLayout.class)
 public class ChatView extends VerticalLayout {
 
     public ChatView() {
@@ -24,7 +23,7 @@ public class ChatView extends VerticalLayout {
         // identifier, and the user's real name. You can also provide the users
         // avatar by passing an url to the image as a third parameter, or by
         // configuring an `ImageProvider` to `avatarGroup`.
-        UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), "Steve Lange");
+        UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), "Steve Lange", "https://demo.magnolia-cms.com/personas/---Wang-Fang/photo/Persona.Wang%20Fang.png.png");
 
         // Tabs allow us to change chat rooms.
         Tabs tabs = new Tabs(new Tab("#general"), new Tab("#support"), new Tab("#casual"));
@@ -45,7 +44,7 @@ public class ChatView extends VerticalLayout {
         // `CollaborationMessageInput is a textfield and button, to be able to
         // submit new messages. To avoid having to set the same info into both
         // the message list and message input, the input takes in the list as an
-        // constructor argument to get the information from there.
+        // constructor argument to convert the information from there.
         CollaborationMessageInput input = new CollaborationMessageInput(list);
         input.addClassNames("chat-view-message-input");
         input.setWidthFull();
