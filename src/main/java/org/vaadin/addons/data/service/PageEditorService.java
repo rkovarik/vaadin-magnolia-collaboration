@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.server.VaadinRequest;
 
 import lombok.SneakyThrows;
@@ -120,7 +119,7 @@ public class PageEditorService {
                         .header(AUTHORIZATION, securityConfiguration.getMagnoliaSuperuserAuthorization())
                         .POST(HttpRequest.BodyPublishers.ofString(objectNode.toString()))
                         .build();
-        Notification.show(String.valueOf(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()));
+        log.info(String.valueOf(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()));
         return entity;
     }
 

@@ -15,6 +15,7 @@
 8. The collaboration engine notifies the user about the other user editing the same component.
 9. As one of the users, save the edited text by pressing ENTER or clicking the save button at the bottom of the form.
 10. The page is re-rendered with new data.
+11. The chat at the bottom briefly informs other users which component was edited. 
 
 > :warning: **The demo runs against https://demo.magnolia-cms.com/**: It might be broken by other users playing with it. But it should be restarted/reset every 30 minutes.
 

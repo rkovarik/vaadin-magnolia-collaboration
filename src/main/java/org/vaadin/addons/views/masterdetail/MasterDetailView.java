@@ -17,15 +17,18 @@ import org.vaadin.addons.components.iframe.PageEditorIFrame;
 import org.vaadin.addons.data.entity.Properties;
 import org.vaadin.addons.data.service.PageEditorService;
 import org.vaadin.addons.views.MainLayout;
+import org.vaadin.addons.views.chat.ChatView;
 import org.vaadin.addons.views.login.SecurityConfiguration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.collaborationengine.CollaborationAvatarGroup;
 import com.vaadin.collaborationengine.CollaborationBinder;
+import com.vaadin.collaborationengine.MessageManager;
 import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -61,6 +64,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     private static final String NAME = "name";
     private static final String VISIBLE = "visible";
     private static final String HIDDEN = "hidden";
+    private final MessageManager messageManager;
 
     private CollaborationAvatarGroup avatarGroup;
 
@@ -98,8 +102,9 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         this.iFrame = iFrame;
         addClassNames("master-detail-view");
 
-        SecurityConfiguration.MagnoliaUser userId = (SecurityConfiguration.MagnoliaUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserInfo userInfo = userId.getUserInfo();
+        SecurityConfiguration.MagnoliaUser user = (SecurityConfiguration.MagnoliaUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserInfo userInfo = user.getUserInfo();
+        messageManager = new MessageManager(this, userInfo, "");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -117,7 +122,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
 
         cancel.addClickListener(e -> {
             clearForm();
-            refreshPreview(""); //TODO
+            refreshPreview("");
         });
 
         save.addClickShortcut(Key.ENTER);
@@ -125,7 +130,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
             try {
                 binder.writeBean(this.properties);
                 pageEditorService.update(this.properties, componentPath);
-                Notification.show("Page properties updated.", 1000, Notification.Position.TOP_CENTER);
+                messageManager.submit("I've updated component " + componentPath);
                 refreshPreview(getPagePath());
             } catch (ValidationException | IOException | InterruptedException validationException) {
                 Notification.show("An exception happened while trying to store the properties details." + validationException.getMessage());
@@ -188,9 +193,13 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     private void createPageEditorLayout(SplitLayout splitLayout) {
         Div wrapper = new Div();
         wrapper.setSizeFull();
-        add(iFrame); //TODO chat
-        splitLayout.addToPrimary(iFrame);
-        wrapper.add(iFrame);
+        iFrame.setSizeFull();
+        var chatView = new ChatView();
+        chatView.setHeight(20, Unit.PERCENTAGE);
+        var splitEditorLayout = new SplitLayout(iFrame, chatView, SplitLayout.Orientation.VERTICAL);
+        add(splitEditorLayout);
+        splitLayout.addToPrimary(splitEditorLayout);
+        wrapper.add(splitEditorLayout);
     }
 
     private void refreshPreview(String path) {
