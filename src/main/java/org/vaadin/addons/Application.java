@@ -18,7 +18,7 @@ import com.vaadin.flow.theme.Theme;
  * and some desktop browsers.
  */
 @SpringBootApplication
-@Theme(value = "collaboration") //TODO CSS
+@Theme(value = "collaboration")
 @PWA(name = "Basic website editor demo", shortName = "Basic website editor")
 @Push
 @NpmPackage(value = "line-awesome", version = "1.3.0")
