@@ -8,6 +8,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -19,7 +20,6 @@ import org.jsoup.nodes.Node;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.vaadin.addons.data.entity.Properties;
-import org.vaadin.addons.views.login.SecurityConfiguration;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,6 +40,8 @@ public class PageEditorService {
     public static final String PROPERTIES = "properties";
     public static final String PROPERTY_NAME = "name";
     public static final String COMPONENT_PATH = "componentPath";
+    public static final String PATH = "path";
+    public static final String NODES = "nodes";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String REST_NODES_V_1_WEBSITE = "/.rest/nodes/v1/website";
     public static final String VALUES = "values";
@@ -50,24 +52,29 @@ public class PageEditorService {
 
     @Value("${magnolia.author.url}")
     private String magnoliaAuthorUrl;
-
     @Value("${magnolia.public.url}")
     private String magnoliaPublicUrl;
+    @Value("${magnolia.admin.name}")
+    private String superuserName;
+    @Value("${magnolia.admin.password}")
+    private String superuserPassword;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
-    private final SecurityConfiguration securityConfiguration;
-
-    public PageEditorService(SecurityConfiguration securityConfiguration) {
-        this.securityConfiguration = securityConfiguration;
+    public PageEditorService() {
         OBJECT_MAPPER.enable(JsonParser.Feature.IGNORE_UNDEFINED);
+    }
+
+    public String getMagnoliaSuperuserAuthorization() {
+        String valueToEncode = superuserName + ":" + superuserPassword;
+        return "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
     }
 
     public Stream<JsonNode> getChildPages(String path) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + path + "?depth=10&excludeNodeTypes=mgnl:area,rep:system,rep:AccessControl,mgnl:component"))
-                .header(AUTHORIZATION, securityConfiguration.getMagnoliaSuperuserAuthorization())
+                .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                 .build();
         try {
             String body = httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
@@ -93,7 +100,7 @@ public class PageEditorService {
     public JsonNode getComponent(String path) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + path))
-                .header(AUTHORIZATION, securityConfiguration.getMagnoliaSuperuserAuthorization())
+                .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                 .build();
         String body = httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
         return OBJECT_MAPPER.reader().readValue(body, JsonNode.class);
@@ -116,7 +123,7 @@ public class PageEditorService {
                 HttpRequest.newBuilder().uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + path))
                         .timeout(Duration.ofMinutes(2))
                         .header("Content-Type", "application/json")
-                        .header(AUTHORIZATION, securityConfiguration.getMagnoliaSuperuserAuthorization())
+                        .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                         .POST(HttpRequest.BodyPublishers.ofString(objectNode.toString()))
                         .build();
         log.info(String.valueOf(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()));
@@ -127,14 +134,13 @@ public class PageEditorService {
         var uri = magnoliaAuthorUrl + path + "?mgnlPreview=false";
         try {
             var doc = Jsoup.connect(uri)
-                    .header(AUTHORIZATION, securityConfiguration.getMagnoliaSuperuserAuthorization())
+                    .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                     .get();
 
             toAbsoluteLinks(doc, "link", HREF);
             toAbsoluteLinks(doc, "img", "src");
             toAbsoluteLinks(doc, "script", "src");
             toAbsoluteLinks(doc, "a", HREF);
-            //            magnoliaLinksToVaadinLinks(doc);
             relativeSetsToAbsoluteSets(doc);
 
             doc.head().append("<link type=\"text/css\" rel=\"stylesheet\" href=\"" + magnoliaAuthorUrl + "/VAADIN/themes/pages-app/page-editor.css\">");

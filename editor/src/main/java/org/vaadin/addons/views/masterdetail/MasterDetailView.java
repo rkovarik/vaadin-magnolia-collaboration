@@ -11,14 +11,13 @@ import java.util.Optional;
 
 import javax.annotation.security.PermitAll;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.vaadin.addons.components.appnav.NavigationGrid;
 import org.vaadin.addons.components.iframe.PageEditorIFrame;
 import org.vaadin.addons.data.entity.Properties;
 import org.vaadin.addons.data.service.PageEditorService;
 import org.vaadin.addons.views.MainLayout;
 import org.vaadin.addons.views.chat.ChatView;
-import org.vaadin.addons.views.login.SecurityConfiguration;
+import org.vaadin.addons.views.login.MagnoliaUser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.collaborationengine.CollaborationAvatarGroup;
@@ -59,9 +58,6 @@ import com.vaadin.flow.spring.annotation.UIScope;
 public class MasterDetailView extends Div implements BeforeEnterObserver {
 
     private static final String VISIBILITY = "visibility";
-    public static final String NODES = "nodes";
-    public static final String PATH = "path";
-    private static final String NAME = "name";
     private static final String VISIBLE = "visible";
     private static final String HIDDEN = "hidden";
     private final MessageManager messageManager;
@@ -102,7 +98,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         this.iFrame = iFrame;
         addClassNames("master-detail-view");
 
-        SecurityConfiguration.MagnoliaUser user = (SecurityConfiguration.MagnoliaUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = MagnoliaUser.getInstance();
         UserInfo userInfo = user.getUserInfo();
         messageManager = new MessageManager(this, userInfo, "");
 
@@ -151,7 +147,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     }
 
     private String getPagePath() {
-        return this.grid.asSingleSelect().getValue().path(PATH).asText();
+        return this.grid.asSingleSelect().getValue().path(PageEditorService.PATH).asText();
     }
 
     @Override
@@ -217,15 +213,15 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         } else {
             editorLayoutDiv.setVisible(true);
         }
-//        allFields.forEach(component -> component.setVisible(false));
-//        jsonNode.path(PROPERTIES).forEach(property -> binder.getBinding(property.path(NAME).asText())
-//                .map(Binder.Binding::getField)
-//                .ifPresent(hasValue -> ((Component) hasValue).setVisible(true))
-//        );
-//        noEditableFields.setVisible(allFields.stream().noneMatch(Component::isVisible));
+        //        allFields.forEach(component -> component.setVisible(false));
+        //        jsonNode.path(PROPERTIES).forEach(property -> binder.getBinding(property.path(NAME).asText())
+        //                .map(Binder.Binding::getField)
+        //                .ifPresent(hasValue -> ((Component) hasValue).setVisible(true))
+        //        );
+        //        noEditableFields.setVisible(allFields.stream().noneMatch(Component::isVisible));
         this.properties = pageEditorService.convert(jsonNode);
 
-        String topic = jsonNode.path(PATH).asText();
+        String topic = jsonNode.path(PageEditorService.PATH).asText();
         binder.setTopic(topic, () -> this.properties);
 
         if (this.properties != null && topic != null) {

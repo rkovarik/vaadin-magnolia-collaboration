@@ -1,7 +1,6 @@
 package org.vaadin.addons.views.chat;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.vaadin.addons.views.login.SecurityConfiguration;
+import org.vaadin.addons.views.login.MagnoliaUser;
 
 import com.vaadin.collaborationengine.CollaborationMessageInput;
 import com.vaadin.collaborationengine.CollaborationMessageList;
@@ -16,7 +15,7 @@ public class ChatView extends VerticalLayout {
         addClassName("chat-view");
         setSpacing(false);
 
-        SecurityConfiguration.MagnoliaUser user = (SecurityConfiguration.MagnoliaUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MagnoliaUser user = MagnoliaUser.getInstance();
         UserInfo userInfo = user.getUserInfo();
 
         CollaborationMessageList list = new CollaborationMessageList(userInfo, "");

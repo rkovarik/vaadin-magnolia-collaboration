@@ -1,6 +1,6 @@
 package org.vaadin.addons.components.appnav;
 
-import static org.vaadin.addons.views.masterdetail.MasterDetailView.NODES;
+import static org.vaadin.addons.data.service.PageEditorService.NODES;
 
 import java.util.Collection;
 import java.util.function.Function;

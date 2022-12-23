@@ -2,20 +2,25 @@
 
 ## Running the page editor application
 
-1. Build/run the application
+1. Build the application
 ```bash
 ./mvnw
 ```
-2. Open the application in your browser [http://localhost:8080/login](http://localhost:8080/login)
-3. Log in with username/password (e.g mmonroe/mmonroe). The demo users are: _mmonroe, vvangogh, jbach, aschopenhauer, ldavinci, rdescartes, ppicasso, fvoltaire, aeinstein, ggalilei_.
-4. Start editing a web page by selecting it from the left navigation menu. The URL should change to e.g. http://localhost:8080/?componentPath=%2Ftravel%2Fcontact
-5. Select a page component by clicking a green bar inside the rendered page in the middle of the screen. The URL should change to e.g. http://localhost:8080/?dialog=travel-demo%3Acomponents%2FtextImage&componentPath=%2Ftravel%2Fcontact%2Fmain%2F00
-6. Start editing a text in the form on the right side of the screen.
-7. Do the same steps (2.-6.) with another user (e.g. name _aeinstein_, password _aeinstein_)
-8. The collaboration engine notifies the user about the other user editing the same component.
-9. As one of the users, save the edited text by pressing ENTER or clicking the save button at the bottom of the form.
-10. The page is re-rendered with new data.
-11. The chat at the bottom briefly informs other users which component was edited. 
+2. Run the application
+```bash
+cd demo
+.././mvnw spring-boot:run
+```
+3. Open the application in your browser [http://localhost:8080/login](http://localhost:8080/login)
+4. Log in with username/password (e.g mmonroe/mmonroe). The demo users are: _mmonroe, vvangogh, jbach, aschopenhauer, ldavinci, rdescartes, ppicasso, fvoltaire, aeinstein, ggalilei_.
+5. Start editing a web page by selecting it from the left navigation menu. The URL should change to e.g. http://localhost:8080/?componentPath=%2Ftravel%2Fcontact
+6. Select a page component by clicking a green bar inside the rendered page in the middle of the screen. The URL should change to e.g. http://localhost:8080/?dialog=travel-demo%3Acomponents%2FtextImage&componentPath=%2Ftravel%2Fcontact%2Fmain%2F00
+7. Start editing a text in the form on the right side of the screen.
+8. Do the same steps (2.-6.) with another user (e.g. name _aeinstein_, password _aeinstein_)
+9. The collaboration engine notifies the user about the other user editing the same component.
+10. As one of the users, save the edited text by pressing ENTER or clicking the save button at the bottom of the form.
+11.The page is re-rendered with new data.
+12. The chat at the bottom briefly informs other users which component was edited. 
 
 > :warning: **The demo runs against https://demo.magnolia-cms.com/**: It might be broken by other users playing with it. But it should be restarted/reset every 30 minutes.
 
@@ -36,7 +41,8 @@ This will build a JAR file with all the dependencies and front-end resources,
 ready to be deployed. The file can be found in the `target` folder after the build completes.
 Once the JAR file is built, you can run it using
 ```bash
-java -jar target/magnolia-page-editor-1.0-SNAPSHOT.jar
+cd demo
+java -jar target/magnolia-page-editor-demo-1.0-SNAPSHOT.jar
 ```
 
 ## Useful links

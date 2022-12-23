@@ -7,9 +7,10 @@ import java.util.ArrayList;
 
 import javax.annotation.security.PermitAll;
 
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.vaadin.addons.components.appnav.NavigationGrid;
-import org.vaadin.addons.views.login.SecurityService;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -22,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 /**
@@ -33,11 +35,9 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     private H2 viewTitle;
 
     private final NavigationGrid grid;
-    private final SecurityService securityService;
 
-    public MainLayout(NavigationGrid navigationGrid, SecurityService securityService) {
+    public MainLayout(NavigationGrid navigationGrid) {
         this.grid = navigationGrid;
-        this.securityService = securityService;
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
@@ -64,7 +64,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
-        Button logout = new Button("Log out", e -> securityService.logout());
+        Button logout = new Button("Log out", e -> logout());
 
         HorizontalLayout header = new HorizontalLayout(toggle, viewTitle, logout);
 
@@ -74,6 +74,12 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         header.addClassNames("py-0", "px-m");
 
         addToNavbar(true, header);
+    }
+
+    private void logout() {
+        UI.getCurrent().getPage().setLocation("/");
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(), null, null);
     }
 
     private void addDrawerContent() {
