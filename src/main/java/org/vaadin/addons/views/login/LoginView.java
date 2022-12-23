@@ -21,6 +21,7 @@ public class LoginView extends HorizontalLayout implements BeforeEnterObserver {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        //TODO caption
         login.setAction("login");
         login.setForgotPasswordButtonVisible(false);
         add(login);
