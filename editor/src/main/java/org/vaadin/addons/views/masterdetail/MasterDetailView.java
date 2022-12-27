@@ -132,7 +132,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         this.componentPath = getParameter(event, COMPONENT_PATH).orElse(getPagePath());
-        var dialog = getParameter(event, DIALOG).orElse(getPagePath());
+        var dialog = getParameter(event, DIALOG).orElse("page");
         edit(componentPath, dialog);
     }
 

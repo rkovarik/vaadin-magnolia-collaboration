@@ -17,6 +17,7 @@ import lombok.Data;
 public final class Templates extends HashMap<String, Templates.Template> {
 
     public Templates() {
+        put("page", new Page());
         put("textImage", new TextImage());
         put("html", new Html());
         put("tourTypeTeaserRow", new TeaserRow());
@@ -129,11 +130,24 @@ public final class Templates extends HashMap<String, Templates.Template> {
         }
     }
 
-    public static class Unknown extends Template {
-        private final TextField description = new TextField("Description");
+    /**
+     *   "hideInNav" : "true",
+     *   "title" : "Search Results",
+     */
+    public static class Page extends Template {
+        private final TextField title = new TextField("Page title");
 
         private final Checkbox hideInNav = new Checkbox("Hide in navigation");
 
+        @Override
+        public Collection<Component> getFields() {
+            return List.of(title, hideInNav);
+        }
+    }
+
+
+    public static class Unknown extends Template {
+        private final TextField description = new TextField("Description");
         private final TextArea json = new TextArea("JSON");
 
         @Override
