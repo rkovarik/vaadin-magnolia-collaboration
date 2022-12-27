@@ -60,9 +60,6 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
     }
 
     public void select(String pagePath) {
-        if (pagePath.equals(selectedPath)) {
-            return;
-        }
         selectedPath = pagePath;
         var dataProvider = getDataProvider();
         JsonNode parentPage = null;

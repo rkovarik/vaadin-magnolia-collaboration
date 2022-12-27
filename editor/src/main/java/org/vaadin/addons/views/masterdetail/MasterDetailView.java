@@ -188,8 +188,6 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setClassName("button-layout");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        cancel.getElement().setAttribute("onclick", "document.getElementByClassName('master-detail-view').$server.getGreeting(\"JavaScript\")"); //TODO
-        cancel.setId("Test");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttonLayout.add(save, cancel);
         editorLayoutDiv.add(buttonLayout);
