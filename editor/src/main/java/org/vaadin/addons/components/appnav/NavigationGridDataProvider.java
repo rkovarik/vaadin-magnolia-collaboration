@@ -3,6 +3,7 @@ package org.vaadin.addons.components.appnav;
 import static org.vaadin.addons.data.service.PageEditorService.NODES;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,7 +33,9 @@ class NavigationGridDataProvider extends AbstractBackEndHierarchicalDataProvider
     @Override
     protected Stream<JsonNode> fetchChildrenFromBackEnd(HierarchicalQuery<JsonNode, Void> query) {
         return query.getParentOptional()
-                    .map(jsonNode -> StreamSupport.stream(jsonNode.path(NODES).spliterator(), false))
+                    .map(jsonNode -> StreamSupport.stream(jsonNode.path(NODES).spliterator(), false)
+                            .sorted(Comparator.comparing(this::hasChildren).reversed())
+                    )
                     .orElseGet(() -> {
                         var cacheKey = "t4st";
                         Collection<JsonNode> jsonNodes = (Collection<JsonNode>) vaadinRequest.getAttribute(cacheKey);
