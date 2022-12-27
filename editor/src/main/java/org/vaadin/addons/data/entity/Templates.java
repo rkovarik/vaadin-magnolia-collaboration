@@ -1,5 +1,6 @@
 package org.vaadin.addons.data.entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,15 +19,21 @@ public final class Templates extends HashMap<String, Templates.Template> {
 
     public Templates() {
         put("page", new Page());
+
         put("textImage", new TextImage());
         put("html", new Html());
+
         put("tourTypeTeaserRow", new TeaserRow());
         put("tourList", new TourList());
+
         put("linkList", new LinkList());
         put("link", new Link());
+
         put("form", new Form());
-        put("formEdit", new Input());
+        put("formEdit", new FormInput());
         put("formSubmit", new Button());
+        put("formSelection", new FormSelection());
+
         put("searchResults", new SearchResults());
     }
 
@@ -130,11 +137,31 @@ public final class Templates extends HashMap<String, Templates.Template> {
      *   "readonly" : "false",
      *   "autocomplete" : "false"
      */
-    public static class Input extends TeaserRow {
+    public static class FormInput extends TeaserRow {
         private final Checkbox mandatory = new Checkbox("Mandatory");
         @Override
         public Collection<Component> getFields() {
             return Arrays.asList(title, mandatory);
+        }
+    }
+
+    /**
+     *   "controlName" : "mealOptions",
+     *   "type" : "radio",
+     *   "title" : "Meal Options",
+     *   "mandatory" : "false",
+     *   "labels" : "Gluten Free:gluten-
+     */
+    public static class FormSelection extends FormInput {
+        private final TextArea labels = new TextArea("Labels");
+        final ComboBox<String> type = new ComboBox<>("Selection type", "radio", "checkbox");
+
+        @Override
+        public Collection<Component> getFields() {
+            var fields = new ArrayList<>(super.getFields());
+            fields.add(labels);
+            fields.add(type);
+            return fields;
         }
     }
 
