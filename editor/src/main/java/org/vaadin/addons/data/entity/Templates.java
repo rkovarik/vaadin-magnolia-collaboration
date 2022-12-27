@@ -23,6 +23,7 @@ public final class Templates extends HashMap<String, Templates.Template> {
 
         put("textImage", new TextImage());
         put("html", new Html());
+        put("teaser", new Teaser());
 
         put("tourTypeTeaserRow", new Title());
         put("tourList", new Title());
@@ -55,7 +56,25 @@ public final class Templates extends HashMap<String, Templates.Template> {
 
         @Override
         public Collection<Component> getFields() {
-            return Arrays.asList(headLine, headlineLevel, text, imagePosition);
+            return List.of(headLine, headlineLevel, text, imagePosition);
+        }
+    }
+
+    /**
+     *   "constrainAspectRatio" : "false",
+     *   "teaserAbstract" : "No membership? No problem. Register for your free membership today.",
+     *   "linkTypepage" : "2c59e7c3-3eed-4725-b64f-90452b8d2df6",
+     *   "linkType" : "page",
+     *   "teaserAbstract_de" : "Kein Mitglied? Kein Problem. Registrieren sie sich heute.",
+     *   "highlight" : "false",
+     *   "hideTeaserImage" : "false"
+     */
+    public static class Teaser extends Templates.Template {
+        private final TextArea teaserAbstract = new TextArea("Abstract");
+
+        @Override
+        public Collection<Component> getFields() {
+            return List.of(teaserAbstract);
         }
     }
 
