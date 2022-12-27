@@ -23,8 +23,8 @@ public final class Templates extends HashMap<String, Templates.Template> {
         put("textImage", new TextImage());
         put("html", new Html());
 
-        put("tourTypeTeaserRow", new TeaserRow());
-        put("tourList", new TourList());
+        put("tourTypeTeaserRow", new Title());
+        put("tourList", new Title());
 
         put("linkList", new LinkList());
         put("link", new Link());
@@ -33,6 +33,7 @@ public final class Templates extends HashMap<String, Templates.Template> {
         put("formEdit", new FormInput());
         put("formSubmit", new Button());
         put("formSelection", new FormSelection());
+        put("formGroupFields", new Title());
 
         put("searchResults", new SearchResults());
     }
@@ -81,21 +82,14 @@ public final class Templates extends HashMap<String, Templates.Template> {
         }
     }
 
-    public static class TeaserRow extends Template {
+    public static class Title extends Template {
         @Override
         public Collection<Component> getFields() {
             return List.of(title);
         }
     }
 
-    public static class TourList extends Template {
-        @Override
-        public Collection<Component> getFields() {
-            return List.of(title);
-        }
-    }
-
-    public static class Link extends TeaserRow {
+    public static class Link extends Title {
         final TextField linkTypeexternal = new TextField("URL", "https://");
 
         @Override
@@ -137,7 +131,7 @@ public final class Templates extends HashMap<String, Templates.Template> {
      *   "readonly" : "false",
      *   "autocomplete" : "false"
      */
-    public static class FormInput extends TeaserRow {
+    public static class FormInput extends Title {
         private final Checkbox mandatory = new Checkbox("Mandatory");
         @Override
         public Collection<Component> getFields() {
