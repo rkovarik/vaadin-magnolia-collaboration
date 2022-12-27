@@ -13,6 +13,7 @@ public class Properties {
 
     private String title;
     private String subtitle;
+    private String formTitle;
     private String text;
     private String description;
     private String imagePosition;

@@ -23,6 +23,7 @@ public final class Templates extends HashMap<String, Templates.Template> {
         put("linkList", new LinkList());
         put("link", new Link());
         put("formEdit", new Input());
+        put("form", new Form());
     }
 
     @Data
@@ -63,6 +64,14 @@ public final class Templates extends HashMap<String, Templates.Template> {
         @Override
         public Collection<Component> getFields() {
             return List.of(title);
+        }
+    }
+
+    public static class Form extends Template {
+        private final TextField formTitle = new TextField();
+        @Override
+        public Collection<Component> getFields() {
+            return List.of(formTitle);
         }
     }
 

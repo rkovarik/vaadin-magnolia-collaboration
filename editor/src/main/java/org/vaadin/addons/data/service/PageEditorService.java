@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vaadin.flow.server.VaadinRequest;
 
@@ -111,6 +112,9 @@ public class PageEditorService {
             ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
             objectNode.put("name", fieldName);
             var node = jsonNode.path(fieldName);
+            if (node instanceof NullNode) {
+                continue;
+            }
             objectNode.set(VALUES, JsonNodeFactory.instance.arrayNode().add(node.asText()));
             objectNode.put("type", StringUtils.capitalize(node.getNodeType().name().toLowerCase()));
             arrayNode.add(objectNode);
