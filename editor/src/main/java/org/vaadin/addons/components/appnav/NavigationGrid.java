@@ -49,6 +49,7 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
             var div = new Div();
             div.setText(name);
             div.addClickListener(event -> select(jsonNode));
+            div.setTitle(name);
             return div;
         });
         setDataProvider(new NavigationGridDataProvider(unused -> pageEditorService.getChildPages("/")));
