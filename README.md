@@ -18,7 +18,7 @@ cd demo
 7. Start editing a text in the form on the right side of the screen.
 8. Do the same steps (2.-6.) with another user (e.g. name _aeinstein_, password _aeinstein_)
 9. The collaboration engine notifies the user about the other user editing the same component.
-10. As one of the users, save the edited text by pressing ENTER or clicking the save button at the bottom of the form.
+10. As one of the users, save the edited text by clicking the save button at the bottom of the form.
 11.The page is re-rendered with new data.
 12. The chat at the bottom briefly informs other users which component was edited. 
 

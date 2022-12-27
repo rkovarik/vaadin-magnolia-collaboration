@@ -24,7 +24,6 @@ import com.vaadin.collaborationengine.CollaborationBinder;
 import com.vaadin.collaborationengine.MessageManager;
 import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -101,7 +100,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
             refreshPreview("");
         });
 
-        save.addClickShortcut(Key.ENTER);
+        //save.addClickShortcut(Key.ENTER);
         save.addClickListener(e -> {
             try {
                 binder.writeBean(this.properties);
