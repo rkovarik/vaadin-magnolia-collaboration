@@ -24,6 +24,7 @@ import com.vaadin.collaborationengine.CollaborationAvatarGroup;
 import com.vaadin.collaborationengine.CollaborationBinder;
 import com.vaadin.collaborationengine.MessageManager;
 import com.vaadin.collaborationengine.UserInfo;
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -55,6 +56,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 @Uses(NavigationGrid.class)
 @SpringComponent
 @UIScope
+//@PreserveOnRefresh
 public class MasterDetailView extends Div implements BeforeEnterObserver {
 
     private static final String VISIBILITY = "visibility";
@@ -156,6 +158,11 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         populateForm(pageEditorService.getComponent(componentPath));
     }
 
+    @ClientCallable
+    public void populateForm(String componentPath) {
+        populateForm(pageEditorService.getComponent(componentPath));
+    }
+
     private static Optional<String> getFirst(BeforeEnterEvent event) {
         return event.getLocation().getQueryParameters().getParameters().getOrDefault(COMPONENT_PATH, Collections.emptyList()).stream()
                 .findFirst();
@@ -181,6 +188,8 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setClassName("button-layout");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        cancel.getElement().setAttribute("onclick", "document.getElementByClassName('master-detail-view').$server.getGreeting(\"JavaScript\")"); //TODO
+        cancel.setId("Test");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttonLayout.add(save, cancel);
         editorLayoutDiv.add(buttonLayout);
@@ -203,7 +212,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     }
 
     private void clearForm() {
-        populateForm(null);
+        populateForm((JsonNode) null);
     }
 
     private void populateForm(JsonNode jsonNode) {

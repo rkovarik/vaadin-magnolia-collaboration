@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinRequest;
 
 import lombok.SneakyThrows;
@@ -144,13 +143,6 @@ public class PageEditorService {
             relativeSetsToAbsoluteSets(doc);
 
             doc.head().append("<link type=\"text/css\" rel=\"stylesheet\" href=\"" + magnoliaAuthorUrl + "/VAADIN/themes/pages-app/page-editor.css\">");
-            doc.head().append("<script>\n" +
-                    "function edit(url) {\n" +
-                    "  var xhr = new XMLHttpRequest();\n" +
-                    "  xhr.open(\"GET\", url, true);" +
-                    "  xhr.send();" +
-                    "}\n" +
-                    "</script>");
             addPageEditorBars(doc.body());
             return doc.toString();
         } catch (IOException e) {
@@ -170,18 +162,15 @@ public class PageEditorService {
                                 var title = StringUtils.substringBetween(comment, "label=\"", "\"");
                                 var dialog = StringUtils.substringBetween(comment, "dialog=\"", "\"");
                                 var mgnlLevel = StringUtils.countMatches(nodePath, "/");
-                                //TODO
                                 var focus = nodePath.equals(VaadinRequest.getCurrent().getParameter(COMPONENT_PATH)) ? "focus" : StringUtils.EMPTY;
-                                var editUrl = EDIT + "?" + UI_ID + "=" + UI.getCurrent().getUIId()
-                                        + "&" + COMPONENT_PATH + "=" + nodePath
-                                        + "&" + DIALOG + "=" + dialog;
+                                var script = "parent.document.getElementsByClassName('master-detail-view')[0].$server.populateForm('" + nodePath + "');";
                                 node.after("<div class=\"mgnlEditorBar mgnlEditor component " + focus + "\" " +
                                         "<div " +
                                         "class=\"mgnlEditorBarLabelSection\"><div></div><div " +
                                         "class=\"mgnlEditorBarLabel " + "mgnlLevel-" + mgnlLevel + "\" " +
                                         "title=\"Jumbotron - Header for a page\">" + title +
                                         "</div></div><div class=\"mgnlEditorBarButtons\">" +
-                                        "<div class=\"editorIcon icon-edit\" onclick=\"edit('" + editUrl + "');\">" +
+                                        "<div class=\"editorIcon icon-edit\" onclick=\"" + script + "\">" +
                                         "</div>");
                             }
                         }
