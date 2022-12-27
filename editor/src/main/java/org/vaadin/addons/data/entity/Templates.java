@@ -18,6 +18,7 @@ public final class Templates extends HashMap<String, Templates.Template> {
 
     public Templates() {
         put("textImage", new TextImage());
+        put("html", new Html());
         put("tourTypeTeaserRow", new TeaserRow());
         put("tourList", new TourList());
         put("linkList", new LinkList());
@@ -29,25 +30,35 @@ public final class Templates extends HashMap<String, Templates.Template> {
 
     @Data
     public abstract static class Template {
-        final TextField headLine = new TextField("Headline");
-        final TextArea text = new TextArea("Text");
         final ComboBox<String> headlineLevel = new ComboBox<>("Headline level", "small", "medium", "big");
-        final ComboBox<String> imagePosition = new ComboBox<>("Image position", "below", "above");
         final TextField title = new TextField("Title");
-        final TextField subtitle = new TextField("Subtitle");
-        final TextField linkTypeexternal = new TextField("URL", "https://");
 
         public abstract Collection<Component> getFields();
     }
 
     public static class TextImage extends Templates.Template {
+        private final TextField headLine = new TextField("Headline");
+        private final TextArea text = new TextArea("Text");
+        private final ComboBox<String> imagePosition = new ComboBox<>("Image position", "below", "above");
+
         @Override
         public Collection<Component> getFields() {
             return Arrays.asList(headLine, headlineLevel, text, imagePosition);
         }
     }
 
+    public static class Html extends Templates.Template {
+        private final TextArea editHTML = new TextArea("HTML");
+
+        @Override
+        public Collection<Component> getFields() {
+            return List.of(editHTML);
+        }
+    }
+
     public static class LinkList extends Template {
+        private final TextField subtitle = new TextField("Subtitle");
+
         @Override
         public Collection<Component> getFields() {
             return Arrays.asList(subtitle, headlineLevel);
@@ -69,6 +80,8 @@ public final class Templates extends HashMap<String, Templates.Template> {
     }
 
     public static class Link extends TeaserRow {
+        final TextField linkTypeexternal = new TextField("URL", "https://");
+
         @Override
         public Collection<Component> getFields() {
             return Arrays.asList(title, headlineLevel, linkTypeexternal);

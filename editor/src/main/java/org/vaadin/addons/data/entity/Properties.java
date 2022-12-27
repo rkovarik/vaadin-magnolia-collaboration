@@ -21,6 +21,7 @@ public class Properties {
     private String headline;
     private String headlineLevel;
     private String linkTypeexternal;
+    private String editHTML;
     private String json;
 
 }
