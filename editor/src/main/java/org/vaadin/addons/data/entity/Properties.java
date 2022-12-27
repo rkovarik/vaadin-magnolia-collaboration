@@ -15,6 +15,7 @@ public class Properties {
     private String subtitle;
     private String formTitle;
     private String text;
+    private String buttonText;
     private String description;
     private String imagePosition;
     private String headline;

@@ -22,8 +22,9 @@ public final class Templates extends HashMap<String, Templates.Template> {
         put("tourList", new TourList());
         put("linkList", new LinkList());
         put("link", new Link());
-        put("formEdit", new Input());
         put("form", new Form());
+        put("formEdit", new Input());
+        put("formSubmit", new Button());
     }
 
     @Data
@@ -67,18 +68,30 @@ public final class Templates extends HashMap<String, Templates.Template> {
         }
     }
 
+    public static class Link extends TeaserRow {
+        @Override
+        public Collection<Component> getFields() {
+            return Arrays.asList(title, headlineLevel, linkTypeexternal);
+        }
+    }
+
     public static class Form extends Template {
-        private final TextField formTitle = new TextField();
+        private final TextField formTitle = new TextField("Form");
         @Override
         public Collection<Component> getFields() {
             return List.of(formTitle);
         }
     }
 
-    public static class Link extends TeaserRow {
+    /**
+     *  "buttonText_de" : "Abschicken",
+     *   "buttonText" : "Send"
+     */
+    public static class Button extends Template {
+        private final TextField buttonText = new TextField("Button text");
         @Override
         public Collection<Component> getFields() {
-            return Arrays.asList(title, headlineLevel, linkTypeexternal);
+            return List.of(buttonText);
         }
     }
 
