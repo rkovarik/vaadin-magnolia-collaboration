@@ -10,6 +10,7 @@ import java.util.List;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -31,11 +32,12 @@ public final class Templates extends HashMap<String, Templates.Template> {
 
         put("form", new Form());
         put("formEdit", new FormInput());
-        put("formSubmit", new Button());
+        put("formSubmit", new FormButton());
         put("formSelection", new FormSelection());
         put("formGroupFields", new Title());
 
         put("searchResults", new SearchResults());
+        put("social", new SocialSharing());
     }
 
     @Data
@@ -98,6 +100,24 @@ public final class Templates extends HashMap<String, Templates.Template> {
         }
     }
 
+    /**
+     *   "rounded" : "false",
+     *   "vertical" : "false",
+     *   "services" : "twitter",
+     *   "size" : "32",
+     *   "floating" : "false"
+     */
+    public static class SocialSharing extends Title {
+        private final NumberField size = new NumberField("Size");
+        private final ComboBox<String> floating = new ComboBox<>("Floating", Boolean.TRUE.toString(), Boolean.FALSE.toString());
+        private final ComboBox<String> vertical = new ComboBox<>("Vertical", Boolean.TRUE.toString(), Boolean.FALSE.toString());
+
+        @Override
+        public Collection<Component> getFields() {
+            return List.of(size, vertical, floating);
+        }
+    }
+
     public static class Form extends Template {
         private final TextField formTitle = new TextField("Form");
         @Override
@@ -110,11 +130,12 @@ public final class Templates extends HashMap<String, Templates.Template> {
      *  "buttonText_de" : "Abschicken",
      *   "buttonText" : "Send"
      */
-    public static class Button extends Template {
+    public static class FormButton extends Template {
         private final TextField buttonText = new TextField("Button text");
+        private final TextField backButtonText = new TextField("Back button text");
         @Override
         public Collection<Component> getFields() {
-            return List.of(buttonText);
+            return List.of(buttonText, backButtonText);
         }
     }
 

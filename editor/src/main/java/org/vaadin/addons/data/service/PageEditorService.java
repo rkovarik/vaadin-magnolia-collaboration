@@ -116,7 +116,9 @@ public class PageEditorService {
                 continue;
             }
             objectNode.set(VALUES, JsonNodeFactory.instance.arrayNode().add(node.asText()));
-            objectNode.put("type", StringUtils.capitalize(node.getNodeType().name().toLowerCase()));
+            var type = node.getNodeType().name();
+            type = "NUMBER".equals(type) ? "Double" : StringUtils.capitalize(type.toLowerCase());
+            objectNode.put("type", type);
             arrayNode.add(objectNode);
         }
         ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
