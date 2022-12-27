@@ -45,8 +45,6 @@ public class PageEditorService {
     private static final String REST_NODES_V_1_WEBSITE = "/.rest/nodes/v1/website";
     public static final String VALUES = "values";
     private static final String HREF = "href";
-    public static final String EDIT = "/edit";
-    public static final String UI_ID = "uiId";
     public static final String DIALOG = "dialog";
 
     @Value("${magnolia.author.url}")
@@ -105,15 +103,16 @@ public class PageEditorService {
         return OBJECT_MAPPER.reader().readValue(body, JsonNode.class);
     }
 
-    public Properties update(Properties entity, String path) throws IOException, InterruptedException {
+    public void update(Properties entity, String path) throws IOException, InterruptedException {
         var jsonNode = OBJECT_MAPPER.valueToTree(entity);
         ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
         for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
             String fieldName = it.next();
             ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
             objectNode.put("name", fieldName);
-            objectNode.set(VALUES, JsonNodeFactory.instance.arrayNode().add(jsonNode.path(fieldName).asText()));
-            objectNode.put("type", "String");
+            var node = jsonNode.path(fieldName);
+            objectNode.set(VALUES, JsonNodeFactory.instance.arrayNode().add(node.asText()));
+            objectNode.put("type", StringUtils.capitalize(node.getNodeType().name().toLowerCase()));
             arrayNode.add(objectNode);
         }
         ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
@@ -126,7 +125,6 @@ public class PageEditorService {
                         .POST(HttpRequest.BodyPublishers.ofString(objectNode.toString()))
                         .build();
         log.info(String.valueOf(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()));
-        return entity;
     }
 
     public String fetchRenderedPage(String path) {
@@ -161,9 +159,12 @@ public class PageEditorService {
                                 var nodePath = StringUtils.substringBetween(comment, "content=\"website:", "\"");
                                 var title = StringUtils.substringBetween(comment, "label=\"", "\"");
                                 var dialog = StringUtils.substringBetween(comment, "dialog=\"", "\"");
+                                dialog = StringUtils.contains(dialog, "/") ? StringUtils.substringAfterLast(dialog, "/") : StringUtils.substringAfter(dialog, ":");
                                 var mgnlLevel = StringUtils.countMatches(nodePath, "/");
                                 var focus = nodePath.equals(VaadinRequest.getCurrent().getParameter(COMPONENT_PATH)) ? "focus" : StringUtils.EMPTY;
-                                var script = "parent.document.getElementsByClassName('master-detail-view')[0].$server.populateForm('" + nodePath + "');";
+                                var script = "parent.document.getElementsByClassName('master-detail-view')[0].$server.populateForm(" +
+                                        "'" + nodePath + "'" + ", '" + dialog + "'" +
+                                        "); this.parentElement.parentElement.classList.add('focus');";
                                 node.after("<div class=\"mgnlEditorBar mgnlEditor component " + focus + "\" " +
                                         "<div " +
                                         "class=\"mgnlEditorBarLabelSection\"><div></div><div " +

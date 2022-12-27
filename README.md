@@ -6,7 +6,7 @@
 ```bash
 ./mvnw
 ```
-2. Run the application
+2. Run/test the application
 ```bash
 cd demo
 .././mvnw spring-boot:run

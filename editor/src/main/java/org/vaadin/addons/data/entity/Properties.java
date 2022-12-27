@@ -9,11 +9,16 @@ import lombok.Data;
 public class Properties {
 
     private Boolean hideInNav;
+    private Boolean mandatory;
+
     private String title;
+    private String subtitle;
     private String text;
     private String description;
     private String imagePosition;
     private String headline;
+    private String headlineLevel;
+    private String linkTypeexternal;
     private String json;
 
 }

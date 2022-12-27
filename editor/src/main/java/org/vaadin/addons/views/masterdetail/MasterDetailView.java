@@ -1,10 +1,8 @@
 package org.vaadin.addons.views.masterdetail;
 
-import static org.vaadin.addons.data.service.PageEditorService.COMPONENT_PATH;
+import static org.vaadin.addons.data.service.PageEditorService.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -14,6 +12,7 @@ import javax.annotation.security.PermitAll;
 import org.vaadin.addons.components.appnav.NavigationGrid;
 import org.vaadin.addons.components.iframe.PageEditorIFrame;
 import org.vaadin.addons.data.entity.Properties;
+import org.vaadin.addons.data.entity.Templates;
 import org.vaadin.addons.data.service.PageEditorService;
 import org.vaadin.addons.views.MainLayout;
 import org.vaadin.addons.views.chat.ChatView;
@@ -25,22 +24,17 @@ import com.vaadin.collaborationengine.CollaborationBinder;
 import com.vaadin.collaborationengine.MessageManager;
 import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -56,7 +50,6 @@ import com.vaadin.flow.spring.annotation.UIScope;
 @Uses(NavigationGrid.class)
 @SpringComponent
 @UIScope
-//@PreserveOnRefresh
 public class MasterDetailView extends Div implements BeforeEnterObserver {
 
     private static final String VISIBILITY = "visibility";
@@ -64,28 +57,16 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     private static final String HIDDEN = "hidden";
     private final MessageManager messageManager;
 
-    private CollaborationAvatarGroup avatarGroup;
-
-    //TODO move these to separate class:
-    private final TextField title = new TextField("Title");
-    private final TextField description = new TextField("Description"); //TODO remove
-
-    private final TextArea json = new TextArea("JSON");
-
-    private final TextField headline = new TextField("Headline");
-
-    private final TextArea text = new TextArea("Text");
-    private final Checkbox hideInNav = new Checkbox("Hide in navigation");
-
-    private final ComboBox<String> imagePosition = new ComboBox<>("Image position", "below", "above");
-
-    private final Collection<Component> allFields = Arrays.asList(title, headline, description, text, hideInNav, imagePosition, json);
+    private final CollaborationAvatarGroup avatarGroup;
 
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
+    private final UserInfo userInfo;
 
-    private final CollaborationBinder<Properties> binder;
+    private CollaborationBinder<Properties> binder;
     private final NavigationGrid grid;
+    private final FormLayout formLayout = new FormLayout();
+    private final Templates templates = new Templates();
 
     private Properties properties;
 
@@ -101,7 +82,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         addClassNames("master-detail-view");
 
         var user = MagnoliaUser.getInstance();
-        UserInfo userInfo = user.getUserInfo();
+        userInfo = user.getUserInfo();
         messageManager = new MessageManager(this, userInfo, "");
 
         // Create UI
@@ -114,9 +95,6 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         createEditorLayout(splitLayout);
 
         add(splitLayout);
-
-        binder = new CollaborationBinder<>(Properties.class, userInfo);
-        binder.bindInstanceFields(this);
 
         cancel.addClickListener(e -> {
             clearForm();
@@ -139,7 +117,6 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         grid.asSingleSelect().addValueChangeListener(changeEvent -> {
             QueryParameters queryParameters = null;
             if (changeEvent.getValue() != null) {
-                populateForm(changeEvent.getValue());
                 queryParameters = new QueryParameters(Map.of(PageEditorService.COMPONENT_PATH, Collections.singletonList(getPagePath())));
             } else {
                 clearForm();
@@ -154,29 +131,37 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        this.componentPath = getFirst(event).orElse(getPagePath());
-        populateForm(pageEditorService.getComponent(componentPath));
+        this.componentPath = getParameter(event, COMPONENT_PATH).orElse(getPagePath());
+        var dialog = getParameter(event, DIALOG).orElse(getPagePath());
+        edit(componentPath, dialog);
     }
 
     @ClientCallable
-    public void populateForm(String componentPath) {
-        populateForm(pageEditorService.getComponent(componentPath));
+    public void populateForm(String componentPath, String dialog) {
+        QueryParameters queryParameters = new QueryParameters(Map.of(
+                COMPONENT_PATH, Collections.singletonList(componentPath),
+                DIALOG, Collections.singletonList(dialog)
+        ));
+        UI.getCurrent().navigate(MasterDetailView.class, queryParameters);
     }
 
-    private static Optional<String> getFirst(BeforeEnterEvent event) {
-        return event.getLocation().getQueryParameters().getParameters().getOrDefault(COMPONENT_PATH, Collections.emptyList()).stream()
+    private void edit(String componentPath, String dialog) {
+        this.componentPath = componentPath;
+        populateForm(pageEditorService.getComponent(componentPath), dialog);
+    }
+
+    private static Optional<String> getParameter(BeforeEnterEvent event, String paramName) {
+        return event.getLocation().getQueryParameters().getParameters().getOrDefault(paramName, Collections.emptyList()).stream()
                 .findFirst();
     }
 
     private void createEditorLayout(SplitLayout splitLayout) {
         editorLayoutDiv.setClassName("editor-layout");
+        editorLayoutDiv.setVisible(false);
 
         Div editorDiv = new Div();
         editorDiv.setClassName("editor");
         editorLayoutDiv.add(editorDiv);
-
-        FormLayout formLayout = new FormLayout();
-        formLayout.add(allFields);
 
         editorDiv.add(avatarGroup, formLayout);
         createButtonLayout(editorLayoutDiv);
@@ -210,22 +195,22 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     }
 
     private void clearForm() {
-        populateForm((JsonNode) null);
+        populateForm((JsonNode) null, null);
     }
 
-    private void populateForm(JsonNode jsonNode) {
-        if (jsonNode == null) {
+    private void populateForm(JsonNode jsonNode, String dialog) {
+        var template = templates.getOrDefault(dialog, new Templates.Unknown());
+        if (jsonNode == null || template == null) {
             editorLayoutDiv.setVisible(false);
             return;
         } else {
             editorLayoutDiv.setVisible(true);
         }
-        //        allFields.forEach(component -> component.setVisible(false));
-        //        jsonNode.path(PROPERTIES).forEach(property -> binder.getBinding(property.path(NAME).asText())
-        //                .map(Binder.Binding::getField)
-        //                .ifPresent(hasValue -> ((Component) hasValue).setVisible(true))
-        //        );
-        //        noEditableFields.setVisible(allFields.stream().noneMatch(Component::isVisible));
+        formLayout.removeAll();
+        formLayout.add(template.getFields());
+        binder = new CollaborationBinder<>(Properties.class, userInfo);
+        binder.bindInstanceFields(template);
+
         this.properties = pageEditorService.convert(jsonNode);
 
         String topic = jsonNode.path(PageEditorService.PATH).asText();
