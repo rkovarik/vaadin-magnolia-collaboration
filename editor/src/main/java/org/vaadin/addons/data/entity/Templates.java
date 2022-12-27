@@ -27,10 +27,12 @@ public final class Templates extends HashMap<String, Templates.Template> {
         put("form", new Form());
         put("formEdit", new Input());
         put("formSubmit", new Button());
+        put("searchResults", new SearchResults());
     }
 
     @Data
     public abstract static class Template {
+        final TextField headLine = new TextField("Headline");
         final ComboBox<String> headlineLevel = new ComboBox<>("Headline level", "small", "medium", "big");
         final TextField title = new TextField("Title");
 
@@ -38,7 +40,6 @@ public final class Templates extends HashMap<String, Templates.Template> {
     }
 
     public static class TextImage extends Templates.Template {
-        private final TextField headLine = new TextField("Headline");
         private final TextArea text = new TextArea("Text");
         private final ComboBox<String> imagePosition = new ComboBox<>("Image position", "below", "above");
 
@@ -63,6 +64,13 @@ public final class Templates extends HashMap<String, Templates.Template> {
         @Override
         public Collection<Component> getFields() {
             return Arrays.asList(subtitle, headlineLevel);
+        }
+    }
+
+    public static class SearchResults extends Template {
+        @Override
+        public Collection<Component> getFields() {
+            return List.of(headLine);
         }
     }
 
