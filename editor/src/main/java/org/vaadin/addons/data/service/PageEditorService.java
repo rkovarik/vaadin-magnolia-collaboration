@@ -178,7 +178,8 @@ public class PageEditorService {
                             if (comment.contains(" cms:component")) {
                                 var dialog = StringUtils.substringBetween(comment, "dialog=\"", "\"");
                                 dialog = StringUtils.contains(dialog, "/") ? StringUtils.substringAfterLast(dialog, "/") : StringUtils.substringAfter(dialog, ":");
-                                var editable = new Templates().get(dialog) != null;
+                                var inherited = StringUtils.substringBetween(comment, "inherited=\"", "\"");
+                                var editable = new Templates().get(dialog) != null && (inherited == null || Boolean.FALSE.toString().equals(inherited));
                                 if (editable) {
                                     var nodePath = StringUtils.substringBetween(comment, "content=\"website:", "\"");
                                     var title = StringUtils.substringBetween(comment, "label=\"", "\"");
