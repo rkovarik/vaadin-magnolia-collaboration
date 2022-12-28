@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -29,8 +30,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.HttpStatusCode;
-import com.vaadin.flow.server.VaadinRequest;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -161,6 +162,7 @@ public class PageEditorService {
             relativeSetsToAbsoluteSets(doc);
 
             doc.head().append("<link type=\"text/css\" rel=\"stylesheet\" href=\"" + magnoliaAuthorUrl + "/VAADIN/themes/pages-app/page-editor.css\">");
+            doc.body().attr("onload", "document.getElementById('focused').scrollIntoView();");
             addPageEditorBars(doc.body());
             return doc.toString();
         } catch (IOException e) {
@@ -169,8 +171,8 @@ public class PageEditorService {
         }
     }
 
-    private Node addPageEditorBars(Node doc) {
-        doc.childNodes().stream()
+    private Node addPageEditorBars(Node body) {
+        body.childNodes().stream()
                 .map(this::addPageEditorBars)
                 .filter(n -> "#comment".equals(n.nodeName()))
                 .forEach(node -> {
@@ -184,7 +186,14 @@ public class PageEditorService {
                                     var nodePath = StringUtils.substringBetween(comment, "content=\"website:", "\"");
                                     var title = StringUtils.substringBetween(comment, "label=\"", "\"");
                                     var mgnlLevel = StringUtils.countMatches(nodePath, "/");
-                                    var focus = nodePath.equals(VaadinRequest.getCurrent().getParameter(COMPONENT_PATH)) ? "focus" : StringUtils.EMPTY;
+                                    var parameter = UI.getCurrent().getInternals().getActiveViewLocation()
+                                            .getQueryParameters()
+                                            .getParameters()
+                                            .getOrDefault(COMPONENT_PATH, List.of())
+                                            .stream()
+                                            .findFirst()
+                                            .orElse(null);
+                                    var focus = nodePath.equals(parameter) ? "focus" : StringUtils.EMPTY;
                                     var getElementScript = "parent.document.getElementsByClassName('master-detail-view')[0].$server.";
                                     var focusScript = "this.parentElement.parentElement.classList.add('focus');";
                                     var editScript = getElementScript + "populateForm('" + nodePath + "'" + ", '" + dialog + "'); " + focusScript;
@@ -192,6 +201,7 @@ public class PageEditorService {
                                     var editIcon = "<div class=\"editorIcon icon-edit\" onclick=\"" + editScript + "\"></div>";
                                     var deleteIcon = "<div class=\"editorIcon icon-delete\" onclick=\"" + deleteScript + "\"></div>";
                                     node.after("<div class=\"mgnlEditorBar mgnlEditor component " + focus + "\" " +
+                                            (focus.isEmpty() ? StringUtils.EMPTY : " id='focused'") +
                                             "<div " + //delete-search, creative, schedule
                                             "class=\"mgnlEditorBarLabelSection\"><div></div><div " +
                                             "class=\"mgnlEditorBarLabel " + "mgnlLevel-" + mgnlLevel + "\" " +
@@ -203,7 +213,7 @@ public class PageEditorService {
                             }
                         }
                 );
-        return doc;
+        return body;
     }
 
     private void relativeSetsToAbsoluteSets(Document doc) {

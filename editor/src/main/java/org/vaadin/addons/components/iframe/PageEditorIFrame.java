@@ -12,6 +12,6 @@ public class PageEditorIFrame extends IFrame {
         setSizeFull();
         this.setSandbox((SandboxType[]) null);
         getElement().setAttribute("frameBorder", "0");
-        getElement().setAttribute("id", "mgnl-pageeditor");
     }
+
 }

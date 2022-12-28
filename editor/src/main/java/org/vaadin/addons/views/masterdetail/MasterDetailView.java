@@ -39,6 +39,8 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.BeforeLeaveEvent;
+import com.vaadin.flow.router.BeforeLeaveObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
@@ -53,7 +55,7 @@ import lombok.SneakyThrows;
 @Uses(NavigationGrid.class)
 @SpringComponent
 @UIScope
-public class MasterDetailView extends Div implements BeforeEnterObserver {
+public class MasterDetailView extends Div implements BeforeEnterObserver, BeforeLeaveObserver {
 
     private static final String VISIBILITY = "visibility";
     private static final String VISIBLE = "visible";
@@ -239,5 +241,10 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
             avatarGroup.getStyle().set(VISIBILITY, HIDDEN);
         }
         avatarGroup.setTopic(topic);
+    }
+
+    @Override
+    public void beforeLeave(BeforeLeaveEvent event) {
+        getElement().executeJs("return this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.scrollTop").then(jsonValue -> jsonValue.asNumber());
     }
 }

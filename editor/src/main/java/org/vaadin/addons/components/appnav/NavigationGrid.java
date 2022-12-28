@@ -10,6 +10,7 @@ import org.vaadin.addons.components.iframe.PageEditorIFrame;
 import org.vaadin.addons.data.service.PageEditorService;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -53,6 +54,11 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
             return div;
         });
         setDataProvider(new NavigationGridDataProvider(unused -> pageEditorService.getChildPages("/")));
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
         select("/travel");
     }
 
