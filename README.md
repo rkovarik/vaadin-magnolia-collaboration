@@ -14,7 +14,10 @@ cd demo
 3. Open the application in your browser [http://localhost:8080/login](http://localhost:8080/login)
 4. Log in with username/password (e.g mmonroe/mmonroe). The demo users are: _mmonroe, vvangogh, jbach, aschopenhauer, ldavinci, rdescartes, ppicasso, fvoltaire, aeinstein, ggalilei_.
 5. Start editing a web page by selecting it from the left navigation menu. The URL should change to e.g. http://localhost:8080/?componentPath=%2Ftravel%2Fcontact
-6. Editable components are marked by pencil icon on the right side of the green bars. Edit a page component by clicking the edit icon inside the rendered page in the middle of the screen. The URL should change to e.g. http://localhost:8080/?dialog=textImage&componentPath=%2Ftravel%2Fcontact%2Fmain%2F00
+6. You can change the navigation title of the page, _Contact -> Contact us_
+7. Save the changes text by clicking the save button at the bottom of the form.
+8. The web page is re-rendered with the new title in the horizontal navigation.
+9. Editable components are marked by pencil icon on the right side of the green bars. Edit a page component by clicking the edit icon inside the rendered page in the middle of the screen. The URL should change to e.g. http://localhost:8080/?dialog=textImage&componentPath=%2Ftravel%2Fcontact%2Fmain%2F0
 7. Start editing a text in the form on the right side of the screen.
 8. Do the same steps (2.-6.) with another user (e.g. name _aeinstein_, password _aeinstein_)
 9. The collaboration engine notifies the user about the other user editing the same component.
