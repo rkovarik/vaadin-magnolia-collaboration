@@ -20,6 +20,7 @@ import org.jsoup.nodes.Node;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.vaadin.addons.data.entity.Properties;
+import org.vaadin.addons.data.entity.Templates;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -162,23 +163,27 @@ public class PageEditorService {
                 .forEach(node -> {
                             String comment = node.attr(node.nodeName());
                             if (comment.contains(" cms:component")) {
-                                var nodePath = StringUtils.substringBetween(comment, "content=\"website:", "\"");
-                                var title = StringUtils.substringBetween(comment, "label=\"", "\"");
                                 var dialog = StringUtils.substringBetween(comment, "dialog=\"", "\"");
                                 dialog = StringUtils.contains(dialog, "/") ? StringUtils.substringAfterLast(dialog, "/") : StringUtils.substringAfter(dialog, ":");
-                                var mgnlLevel = StringUtils.countMatches(nodePath, "/");
-                                var focus = nodePath.equals(VaadinRequest.getCurrent().getParameter(COMPONENT_PATH)) ? "focus" : StringUtils.EMPTY;
-                                var script = "parent.document.getElementsByClassName('master-detail-view')[0].$server.populateForm(" +
-                                        "'" + nodePath + "'" + ", '" + dialog + "'" +
-                                        "); this.parentElement.parentElement.classList.add('focus');";
-                                node.after("<div class=\"mgnlEditorBar mgnlEditor component " + focus + "\" " +
-                                        "<div " +
-                                        "class=\"mgnlEditorBarLabelSection\"><div></div><div " +
-                                        "class=\"mgnlEditorBarLabel " + "mgnlLevel-" + mgnlLevel + "\" " +
-                                        "title=\"Jumbotron - Header for a page\">" + title +
-                                        "</div></div><div class=\"mgnlEditorBarButtons\">" +
-                                        "<div class=\"editorIcon icon-edit\" onclick=\"" + script + "\">" +
-                                        "</div>");
+                                var editable = new Templates().get(dialog) != null;
+                                if (editable) {
+                                    var nodePath = StringUtils.substringBetween(comment, "content=\"website:", "\"");
+                                    var title = StringUtils.substringBetween(comment, "label=\"", "\"");
+                                    var mgnlLevel = StringUtils.countMatches(nodePath, "/");
+                                    var focus = nodePath.equals(VaadinRequest.getCurrent().getParameter(COMPONENT_PATH)) ? "focus" : StringUtils.EMPTY;
+                                    var script = "parent.document.getElementsByClassName('master-detail-view')[0].$server.populateForm(" +
+                                            "'" + nodePath + "'" + ", '" + dialog + "'" +
+                                            "); this.parentElement.parentElement.classList.add('focus');";
+                                    var editIcon = "<div class=\"editorIcon icon-edit\" onclick=\"" + script + "\">";
+                                    node.after("<div class=\"mgnlEditorBar mgnlEditor component " + focus + "\" " +
+                                            "<div " +
+                                            "class=\"mgnlEditorBarLabelSection\"><div></div><div " +
+                                            "class=\"mgnlEditorBarLabel " + "mgnlLevel-" + mgnlLevel + "\" " +
+                                            "title=\"Jumbotron - Header for a page\">" + title +
+                                            "</div></div><div class=\"mgnlEditorBarButtons\">" +
+                                            editIcon +
+                                            "</div>");
+                                }
                             }
                         }
                 );

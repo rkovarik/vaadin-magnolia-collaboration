@@ -205,6 +205,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         } else {
             editorLayoutDiv.setVisible(true);
         }
+        //TODO add form title
         formLayout.removeAll();
         formLayout.add(template.getFields());
         binder = new CollaborationBinder<>(Properties.class, userInfo);

@@ -14,7 +14,7 @@ cd demo
 3. Open the application in your browser [http://localhost:8080/login](http://localhost:8080/login)
 4. Log in with username/password (e.g mmonroe/mmonroe). The demo users are: _mmonroe, vvangogh, jbach, aschopenhauer, ldavinci, rdescartes, ppicasso, fvoltaire, aeinstein, ggalilei_.
 5. Start editing a web page by selecting it from the left navigation menu. The URL should change to e.g. http://localhost:8080/?componentPath=%2Ftravel%2Fcontact
-6. Select a page component by clicking a green bar inside the rendered page in the middle of the screen. The URL should change to e.g. http://localhost:8080/?dialog=travel-demo%3Acomponents%2FtextImage&componentPath=%2Ftravel%2Fcontact%2Fmain%2F00
+6. Editable components are marked by pencil icon on the right side of the green bars. Edit a page component by clicking the edit icon inside the rendered page in the middle of the screen. The URL should change to e.g. http://localhost:8080/?dialog=textImage&componentPath=%2Ftravel%2Fcontact%2Fmain%2F00
 7. Start editing a text in the form on the right side of the screen.
 8. Do the same steps (2.-6.) with another user (e.g. name _aeinstein_, password _aeinstein_)
 9. The collaboration engine notifies the user about the other user editing the same component.
@@ -22,7 +22,7 @@ cd demo
 11.The page is re-rendered with new data.
 12. The chat at the bottom briefly informs other users which component was edited. 
 
-> :warning: **The demo runs against https://demo.magnolia-cms.com/**: It might be broken by other users playing with it. But it should be restarted/reset every 30 minutes.
+> :warning: **The demo runs against https://demo.magnolia-cms.com/**: It might be broken by other users playing with it and you might get an error like _Can't fetch the Magnolia page /travel_. But it should be restarted/reset every 30 minutes. 
 
 ## Developing the page editor application
 
