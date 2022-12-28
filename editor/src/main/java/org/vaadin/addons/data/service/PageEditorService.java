@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vaadin.flow.server.HttpStatusCode;
 import com.vaadin.flow.server.VaadinRequest;
 
 import lombok.SneakyThrows;
@@ -101,7 +102,11 @@ public class PageEditorService {
                 .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + path))
                 .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                 .build();
-        String body = httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != HttpStatusCode.OK.getCode()) {
+            return null;
+        }
+        String body = response.body();
         return OBJECT_MAPPER.reader().readValue(body, JsonNode.class);
     }
 
@@ -130,6 +135,14 @@ public class PageEditorService {
                         .header("Content-Type", "application/json")
                         .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                         .POST(HttpRequest.BodyPublishers.ofString(objectNode.toString()))
+                        .build();
+        log.info(String.valueOf(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()));
+    }
+
+    public void delete(String componentPath) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + componentPath))
+                        .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
+                        .DELETE()
                         .build();
         log.info(String.valueOf(httpClient.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()));
     }
@@ -171,18 +184,20 @@ public class PageEditorService {
                                     var title = StringUtils.substringBetween(comment, "label=\"", "\"");
                                     var mgnlLevel = StringUtils.countMatches(nodePath, "/");
                                     var focus = nodePath.equals(VaadinRequest.getCurrent().getParameter(COMPONENT_PATH)) ? "focus" : StringUtils.EMPTY;
-                                    var script = "parent.document.getElementsByClassName('master-detail-view')[0].$server.populateForm(" +
-                                            "'" + nodePath + "'" + ", '" + dialog + "'" +
-                                            "); this.parentElement.parentElement.classList.add('focus');";
-                                    var editIcon = "<div class=\"editorIcon icon-edit\" onclick=\"" + script + "\">";
+                                    var getElementScript = "parent.document.getElementsByClassName('master-detail-view')[0].$server.";
+                                    var focusScript = "this.parentElement.parentElement.classList.add('focus');";
+                                    var editScript = getElementScript + "populateForm('" + nodePath + "'" + ", '" + dialog + "'); " + focusScript;
+                                    var deleteScript = getElementScript + "delete('" + nodePath + "'); " + focusScript;
+                                    var editIcon = "<div class=\"editorIcon icon-edit\" onclick=\"" + editScript + "\"></div>";
+                                    var deleteIcon = "<div class=\"editorIcon icon-delete\" onclick=\"" + deleteScript + "\"></div>";
                                     node.after("<div class=\"mgnlEditorBar mgnlEditor component " + focus + "\" " +
-                                            "<div " +
+                                            "<div " + //delete-search, creative, schedule
                                             "class=\"mgnlEditorBarLabelSection\"><div></div><div " +
                                             "class=\"mgnlEditorBarLabel " + "mgnlLevel-" + mgnlLevel + "\" " +
-                                            "title=\"Jumbotron - Header for a page\">" + title +
+                                            "title=\"" + title + "\">" + title +
                                             "</div></div><div class=\"mgnlEditorBarButtons\">" +
-                                            editIcon +
-                                            "</div>");
+                                            editIcon + deleteIcon
+                                    );
                                 }
                             }
                         }
@@ -218,5 +233,4 @@ public class PageEditorService {
             }
         });
     }
-
 }

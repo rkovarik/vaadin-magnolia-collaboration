@@ -4,11 +4,13 @@ import static org.vaadin.addons.data.service.PageEditorService.*;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.security.PermitAll;
 
+import org.apache.commons.lang3.StringUtils;
 import org.vaadin.addons.components.appnav.NavigationGrid;
 import org.vaadin.addons.components.iframe.PageEditorIFrame;
 import org.vaadin.addons.data.entity.Properties;
@@ -42,6 +44,8 @@ import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+
+import lombok.SneakyThrows;
 
 @PageTitle("Page Editor")
 @Route(value = "/", layout = MainLayout.class)
@@ -114,18 +118,22 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         cancel.addClickListener(clickEvent -> editorLayoutDiv.setVisible(false));
 
         grid.asSingleSelect().addValueChangeListener(changeEvent -> {
-            QueryParameters queryParameters = null;
+            Map<String, List<String>> queryParameters;
             if (changeEvent.getValue() != null) {
-                queryParameters = new QueryParameters(Map.of(PageEditorService.COMPONENT_PATH, Collections.singletonList(getPagePath())));
+                queryParameters = Map.of(PageEditorService.COMPONENT_PATH, Collections.singletonList(getPagePath()));
             } else {
+                queryParameters = Map.of();
                 clearForm();
             }
-            UI.getCurrent().navigate(MasterDetailView.class, queryParameters);
+            UI.getCurrent().navigate(MasterDetailView.class, new QueryParameters(queryParameters));
         });
     }
 
     private String getPagePath() {
-        return this.grid.asSingleSelect().getValue().path(PageEditorService.PATH).asText();
+        return this.grid.asSingleSelect().getOptionalValue()
+                .map(jsonNode -> jsonNode.path(PageEditorService.PATH))
+                .map(JsonNode::asText)
+                .orElse("/");
     }
 
     @Override
@@ -142,6 +150,15 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
                 DIALOG, Collections.singletonList(dialog)
         ));
         UI.getCurrent().navigate(MasterDetailView.class, queryParameters);
+    }
+
+    @ClientCallable
+    @SneakyThrows
+    public void delete(String componentPath) {
+        pageEditorService.delete(componentPath);
+        var path = StringUtils.stripStart(componentPath, "/");
+        path = StringUtils.substringBefore(path, "/");
+        grid.select("/" + path);
     }
 
     private void edit(String componentPath, String dialog) {
