@@ -1,5 +1,7 @@
 # Basic Magnolia Editor
 
+https://user-images.githubusercontent.com/14125009/209827812-2e520d79-83c6-4354-9be4-5d6cd7dd8e35.mp4
+
 ## Running the page editor application
 
 1. Build the application
