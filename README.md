@@ -1,6 +1,6 @@
 # Basic Magnolia Editor
 
-https://user-images.githubusercontent.com/14125009/209827812-2e520d79-83c6-4354-9be4-5d6cd7dd8e35.mp4
+https://user-images.githubusercontent.com/14125009/209965642-27668c16-2e44-4503-a5b6-37a02f631995.mp4
 
 ## Running the page editor application
 
@@ -54,3 +54,4 @@ java -jar target/magnolia-page-editor-demo-1.0-SNAPSHOT.jar
 
 - Vaadin Collaboration Engine [https://vaadin.com/collaboration](https://vaadin.com/collaboration).
 - Report issues, create pull requests in [GitHub](https://github.com/rkovarik/vaadin-magnolia-collaboration).
+- [Magnolia demo](https://demopublic.magnolia-cms.com/)
