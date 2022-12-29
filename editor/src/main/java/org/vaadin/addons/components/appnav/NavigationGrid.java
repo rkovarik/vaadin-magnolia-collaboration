@@ -12,7 +12,7 @@ import org.vaadin.addons.data.service.PageEditorService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -25,8 +25,6 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
     public static final String TYPE = "type";
     private static final String MGNL_PAGE = "mgnl:page";
 
-    private String selectedPath = "/";
-
     private final PageEditorIFrame iFrame;
     private final PageEditorService pageEditorService;
 
@@ -37,7 +35,7 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
 
         addItemClickListener(event -> select(event.getItem()));
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
         addComponentHierarchyColumn(jsonNode -> {
             var name = jsonNode.path(PROPERTY_NAME).asText();
@@ -47,7 +45,7 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
                     name = property.path(VALUES).elements().next().asText();
                 }
             }
-            var div = new Div();
+            var div = new Span();
             div.setText(name);
             div.addClickListener(event -> select(jsonNode));
             div.setTitle(name);
@@ -67,7 +65,6 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
     }
 
     public void select(String pagePath) {
-        selectedPath = pagePath;
         var dataProvider = getDataProvider();
         JsonNode parentPage = null;
         JsonNode objectNode = null;
