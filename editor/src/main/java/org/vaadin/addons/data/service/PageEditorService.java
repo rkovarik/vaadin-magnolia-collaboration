@@ -44,14 +44,16 @@ public class PageEditorService {
     public static final String PROPERTY_NAME = "name";
     public static final String COMPONENT_PATH = "componentPath";
     public static final String PATH = "path";
+    public static final String IDENTIFIER = "identifier";
     public static final String NODES = "nodes";
     public static final String TYPE = "type";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String REST_NODES_V_1_WEBSITE = "/.rest/nodes/v1/website";
+    private static final String REST_NODES_V_1 = "/.rest/nodes/v1/";
     public static final String VALUES = "values";
     private static final String HREF = "href";
     public static final String DIALOG = "dialog";
     public static final String TITLE = "title";
+    public static final String WEBSITE = "website";
 
     @Value("${magnolia.author.url}")
     private String magnoliaAuthorUrl;
@@ -74,9 +76,9 @@ public class PageEditorService {
         return "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
     }
 
-    public Stream<JsonNode> getChildPages(String path) {
+    public Stream<JsonNode> getChildPages(String path, String workspace) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + path + "?depth=10&excludeNodeTypes=mgnl:area,rep:system,rep:AccessControl,mgnl:component"))
+                .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1 + workspace + path + "?depth=10&excludeNodeTypes=mgnl:area,rep:system,rep:AccessControl,mgnl:component,mgnl:resource"))
                 .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                 .build();
         try {
@@ -102,7 +104,7 @@ public class PageEditorService {
     @SneakyThrows
     public JsonNode getComponent(String path) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + path))
+                .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1 + WEBSITE + path))
                 .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                 .build();
         var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -133,7 +135,7 @@ public class PageEditorService {
         ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
         objectNode.set(PROPERTIES, arrayNode);
         HttpRequest request =
-                HttpRequest.newBuilder().uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + path))
+                HttpRequest.newBuilder().uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1 + WEBSITE + path))
                         .timeout(Duration.ofMinutes(2))
                         .header("Content-Type", "application/json")
                         .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
@@ -143,7 +145,7 @@ public class PageEditorService {
     }
 
     public void delete(String componentPath) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1_WEBSITE + componentPath))
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1 + WEBSITE + componentPath))
                         .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                         .DELETE()
                         .build();
@@ -164,7 +166,7 @@ public class PageEditorService {
             relativeSetsToAbsoluteSets(doc);
 
             doc.head().append("<link type=\"text/css\" rel=\"stylesheet\" href=\"" + magnoliaAuthorUrl + "/VAADIN/themes/pages-app/page-editor.css\">");
-            doc.body().attr("onload", "document.getElementById('focused').scrollIntoView();");
+            doc.body().attr("onload", "document.getElementById('focused')?.scrollIntoView();");
             addPageEditorBars(doc.body());
             return doc.toString();
         } catch (IOException e) {
@@ -183,7 +185,7 @@ public class PageEditorService {
                                 var dialog = StringUtils.substringBetween(comment, "dialog=\"", "\"");
                                 dialog = StringUtils.contains(dialog, "/") ? StringUtils.substringAfterLast(dialog, "/") : StringUtils.substringAfter(dialog, ":");
                                 var inherited = StringUtils.substringBetween(comment, "inherited=\"", "\"");
-                                var editable = new Templates().get(dialog) != null && (inherited == null || Boolean.FALSE.toString().equals(inherited));
+                                var editable = new Templates(magnoliaPublicUrl, this).get(dialog) != null && (inherited == null || Boolean.FALSE.toString().equals(inherited));
                                 if (editable) {
                                     var nodePath = StringUtils.substringBetween(comment, "content=\"website:", "\"");
                                     var title = StringUtils.substringBetween(comment, "label=\"", "\"");

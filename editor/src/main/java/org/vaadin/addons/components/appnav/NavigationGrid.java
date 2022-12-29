@@ -50,7 +50,7 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
             div.setTitle(name);
             return div;
         });
-        setDataProvider(new NavigationGridDataProvider(unused -> pageEditorService.getChildPages("/")));
+        setDataProvider(new NavigationGridDataProvider(unused -> pageEditorService.getChildPages("/", "website")));
     }
 
     @Override

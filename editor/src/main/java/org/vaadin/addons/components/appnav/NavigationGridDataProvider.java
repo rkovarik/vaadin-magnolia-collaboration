@@ -37,7 +37,7 @@ class NavigationGridDataProvider extends AbstractBackEndHierarchicalDataProvider
                             .sorted(Comparator.comparing(this::hasChildren).reversed())
                     )
                     .orElseGet(() -> {
-                        var cacheKey = "t4st";
+                        var cacheKey = getClass().getName();
                         Collection<JsonNode> jsonNodes = (Collection<JsonNode>) vaadinRequest.getAttribute(cacheKey);
                         if (jsonNodes == null) {
                             jsonNodes = pageEditorService.apply(null).collect(Collectors.toList());

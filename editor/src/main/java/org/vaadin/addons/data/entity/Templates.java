@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.vaadin.addons.components.appnav.ImageSelector;
+import org.vaadin.addons.data.service.PageEditorService;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -18,10 +21,10 @@ import lombok.Data;
 
 public final class Templates extends HashMap<String, Templates.Template> {
 
-    public Templates() {
+    public Templates(String magnoliaPublicUrl, PageEditorService pageEditorService) {
         put("page", new Page());
 
-        put("textImage", new TextImage());
+        put("textImage", new TextImage(magnoliaPublicUrl, pageEditorService));
         put("html", new Html());
         put("teaser", new Teaser());
 
@@ -50,13 +53,20 @@ public final class Templates extends HashMap<String, Templates.Template> {
         public abstract Collection<Component> getFields();
     }
 
+    @Data
     public static class TextImage extends Templates.Template {
         private final TextArea text = new TextArea("Text");
         private final ComboBox<String> imagePosition = new ComboBox<>("Image position", "below", "above");
+        private final ImageSelector image;
+
+        public TextImage(String magnoliaPublicUrl, PageEditorService pageEditorService) {
+            image  = new ImageSelector(magnoliaPublicUrl, pageEditorService);
+        }
+
 
         @Override
         public Collection<Component> getFields() {
-            return List.of(headLine, headlineLevel, text, imagePosition);
+            return List.of(headLine, headlineLevel, text, image, imagePosition);
         }
     }
 

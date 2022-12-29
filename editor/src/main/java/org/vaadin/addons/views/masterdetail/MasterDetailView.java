@@ -11,6 +11,8 @@ import java.util.Optional;
 import javax.annotation.security.PermitAll;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.vaadin.addons.components.appnav.ImageSelector;
 import org.vaadin.addons.components.appnav.NavigationGrid;
 import org.vaadin.addons.components.iframe.PageEditorIFrame;
 import org.vaadin.addons.data.entity.Properties;
@@ -20,7 +22,9 @@ import org.vaadin.addons.views.MainLayout;
 import org.vaadin.addons.views.chat.ChatView;
 import org.vaadin.addons.views.login.MagnoliaUser;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.collaborationengine.CollaborationAvatarGroup;
 import com.vaadin.collaborationengine.CollaborationBinder;
 import com.vaadin.collaborationengine.MessageManager;
@@ -68,13 +72,16 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     private final Button save = new Button("Save");
     private final UserInfo userInfo;
     private final HtmlContainer formTitle = new H3("Test");
-    private static final Templates TEMPLATES = new Templates();
-
     private CollaborationBinder<Properties> binder;
     private final NavigationGrid grid;
     private final FormLayout formLayout = new FormLayout();
 
     private Properties properties;
+
+    @Value("${magnolia.public.url}")
+    private String magnoliaPublicUrl = null;
+
+    private Templates TEMPLATES;
 
     private final PageEditorService pageEditorService;
     private final PageEditorIFrame iFrame;
@@ -141,6 +148,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        TEMPLATES = new Templates(magnoliaPublicUrl, pageEditorService);
         this.componentPath = getParameter(event, COMPONENT_PATH).orElse(getPagePath());
         var dialog = getParameter(event, DIALOG).orElse("page");
         var title = getParameter(event, TITLE).orElse("Page properties");
@@ -217,7 +225,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     }
 
     private void clearForm() {
-        populateForm((JsonNode) null, null);
+        populateForm(null, null);
     }
 
     private void populateForm(JsonNode jsonNode, String dialog) {
@@ -231,6 +239,20 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         formLayout.removeAll();
         formLayout.add(template.getFields());
         binder = new CollaborationBinder<>(Properties.class, userInfo);
+        if (template instanceof Templates.TextImage) {
+            binder.setSerializer(JsonNode.class, JsonNode::toString, s -> {
+                try {
+                    return new ObjectMapper().readValue(s, JsonNode.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            var field = ((Templates.TextImage) template).getImage();
+            ImageSelector.DataProvider dataProvider = (ImageSelector.DataProvider) field.getDataProvider();
+            binder.forField(field, JsonNode.class)
+                    .withConverter(dataProvider::getId, dataProvider::getItem)
+                    .bind("image");
+        }
         binder.bindInstanceFields(template);
 
         this.properties = pageEditorService.convert(jsonNode);
