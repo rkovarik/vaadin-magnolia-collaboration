@@ -50,6 +50,7 @@ public class PageEditorService {
     public static final String VALUES = "values";
     private static final String HREF = "href";
     public static final String DIALOG = "dialog";
+    public static final String TITLE = "title";
 
     @Value("${magnolia.author.url}")
     private String magnoliaAuthorUrl;
@@ -196,7 +197,11 @@ public class PageEditorService {
                                     var focus = nodePath.equals(parameter) ? "focus" : StringUtils.EMPTY;
                                     var getElementScript = "parent.document.getElementsByClassName('master-detail-view')[0].$server.";
                                     var focusScript = "this.parentElement.parentElement.classList.add('focus');";
-                                    var editScript = getElementScript + "populateForm('" + nodePath + "'" + ", '" + dialog + "'); " + focusScript;
+                                    var editScript = getElementScript + "edit(" +
+                                            "'" + nodePath + "'" + ", " +
+                                            "'" + dialog + "'" +
+                                            ", '" + title + "'" +
+                                            "); " + focusScript;
                                     var deleteScript = getElementScript + "delete('" + nodePath + "'); " + focusScript;
                                     var editIcon = "<div class=\"editorIcon icon-edit\" onclick=\"" + editScript + "\"></div>";
                                     var deleteIcon = "<div class=\"editorIcon icon-delete\" onclick=\"" + deleteScript + "\"></div>";

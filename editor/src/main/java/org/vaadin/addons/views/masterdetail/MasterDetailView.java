@@ -26,6 +26,7 @@ import com.vaadin.collaborationengine.CollaborationBinder;
 import com.vaadin.collaborationengine.MessageManager;
 import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.HtmlContainer;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -33,6 +34,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
@@ -65,11 +67,12 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
     private final UserInfo userInfo;
+    private final HtmlContainer formTitle = new H3("Test");
+    private static final Templates TEMPLATES = new Templates();
 
     private CollaborationBinder<Properties> binder;
     private final NavigationGrid grid;
     private final FormLayout formLayout = new FormLayout();
-    private final Templates templates = new Templates();
 
     private Properties properties;
 
@@ -140,14 +143,17 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     public void beforeEnter(BeforeEnterEvent event) {
         this.componentPath = getParameter(event, COMPONENT_PATH).orElse(getPagePath());
         var dialog = getParameter(event, DIALOG).orElse("page");
+        var title = getParameter(event, TITLE).orElse("Page properties");
+        formTitle.setText(title);
         edit(componentPath, dialog);
     }
 
     @ClientCallable
-    public void populateForm(String componentPath, String dialog) {
+    public void edit(String componentPath, String dialog, String title) {
         QueryParameters queryParameters = new QueryParameters(Map.of(
                 COMPONENT_PATH, Collections.singletonList(componentPath),
-                DIALOG, Collections.singletonList(dialog)
+                DIALOG, Collections.singletonList(dialog),
+                TITLE, Collections.singletonList(title)
         ));
         UI.getCurrent().navigate(MasterDetailView.class, queryParameters);
     }
@@ -179,7 +185,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         editorDiv.setClassName("editor");
         editorLayoutDiv.add(editorDiv);
 
-        editorDiv.add(avatarGroup, formLayout);
+        editorDiv.add(formTitle, avatarGroup, formLayout);
         createButtonLayout(editorLayoutDiv);
 
         splitLayout.addToSecondary(editorLayoutDiv);
@@ -215,14 +221,13 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     }
 
     private void populateForm(JsonNode jsonNode, String dialog) {
-        var template = templates.getOrDefault(dialog, new Templates.Unknown());
+        var template = TEMPLATES.getOrDefault(dialog, new Templates.Unknown());
         if (jsonNode == null || template == null) {
             editorLayoutDiv.setVisible(false);
             return;
         } else {
             editorLayoutDiv.setVisible(true);
         }
-        //TODO add form title
         formLayout.removeAll();
         formLayout.add(template.getFields());
         binder = new CollaborationBinder<>(Properties.class, userInfo);
