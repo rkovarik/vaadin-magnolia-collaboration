@@ -193,9 +193,11 @@
     "@vaadin/select": "$@vaadin/select",
     "@vaadin/split-layout": "$@vaadin/split-layout",
     "@vaadin/tabs": "$@vaadin/tabs",
+    "@vaadin/tabsheet": "$@vaadin/tabsheet",
     "@vaadin/text-area": "$@vaadin/text-area",
     "@vaadin/text-field": "$@vaadin/text-field",
     "@vaadin/time-picker": "$@vaadin/time-picker",
+    "@vaadin/tooltip": "$@vaadin/tooltip",
     "@vaadin/upload": "$@vaadin/upload",
     "@vaadin/vaadin-accordion": "$@vaadin/vaadin-accordion",
     "@vaadin/vaadin-app-layout": "$@vaadin/vaadin-app-layout",
@@ -261,9 +263,7 @@
     "proj4": "$proj4",
     "line-awesome": "$line-awesome",
     "@vaadin-component-factory/vcf-nav": "$@vaadin-component-factory/vcf-nav",
-    "date-fns": "$date-fns",
-    "@vaadin/tabsheet": "$@vaadin/tabsheet",
-    "@vaadin/tooltip": "$@vaadin/tooltip"
+    "date-fns": "$date-fns"
   },
   "vaadin": {
     "dependencies": {
