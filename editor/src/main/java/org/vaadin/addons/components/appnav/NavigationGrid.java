@@ -22,7 +22,6 @@ import com.vaadin.flow.spring.annotation.UIScope;
 @UIScope
 public class NavigationGrid extends TreeGrid<JsonNode> {
 
-    public static final String TYPE = "type";
     private static final String MGNL_PAGE = "mgnl:page";
 
     private final PageEditorIFrame iFrame;
@@ -41,7 +40,7 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
             var name = jsonNode.path(PROPERTY_NAME).asText();
             for (Iterator<JsonNode> it = jsonNode.path(PROPERTIES).elements(); it.hasNext(); ) {
                 JsonNode property = it.next();
-                if (property.path(PROPERTY_NAME).asText().equals("title")) {
+                if (property.path(PROPERTY_NAME).asText().equals(TITLE)) {
                     name = property.path(VALUES).elements().next().asText();
                 }
             }
@@ -70,7 +69,7 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
         JsonNode objectNode = null;
         for (String nodeName : StringUtils.split(pagePath, "/")) {
             objectNode = dataProvider.fetch(new HierarchicalQuery<>(null, objectNode))
-                    .filter(jsonNode -> jsonNode.path("name").asText().equals(nodeName))
+                    .filter(jsonNode -> jsonNode.path(PROPERTY_NAME).asText().equals(nodeName))
                     .findFirst()
                     .orElse(parentPage);
 
@@ -82,7 +81,7 @@ public class NavigationGrid extends TreeGrid<JsonNode> {
         select(objectNode);
         expand(objectNode);
         if (parentPage != null) {
-            var path = parentPage.path("path").asText();
+            var path = parentPage.path(PATH).asText();
             var renderedPage = pageEditorService.fetchRenderedPage(path);
             iFrame.setSrcdoc(renderedPage);
         }

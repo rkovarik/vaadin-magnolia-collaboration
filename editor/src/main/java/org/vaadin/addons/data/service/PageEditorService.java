@@ -45,6 +45,7 @@ public class PageEditorService {
     public static final String COMPONENT_PATH = "componentPath";
     public static final String PATH = "path";
     public static final String NODES = "nodes";
+    public static final String TYPE = "type";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String REST_NODES_V_1_WEBSITE = "/.rest/nodes/v1/website";
     public static final String VALUES = "values";
@@ -92,7 +93,7 @@ public class PageEditorService {
     public Properties convert(JsonNode node) {
         ArrayNode jsonNode = (ArrayNode) OBJECT_MAPPER.reader().readValue(node.toString(), JsonNode.class).path(PROPERTIES);
         ObjectNode transformed = JsonNodeFactory.instance.objectNode();
-        jsonNode.forEach(child -> transformed.put(child.path("name").asText(), child.path(VALUES).get(0).asText()));
+        jsonNode.forEach(child -> transformed.put(child.path(PROPERTY_NAME).asText(), child.path(VALUES).get(0).asText()));
         var properties = OBJECT_MAPPER.reader().readValue(transformed.toString(), Properties.class);
         properties.setJson(transformed.toPrettyString());
         return properties;
@@ -118,7 +119,7 @@ public class PageEditorService {
         for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
             String fieldName = it.next();
             ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
-            objectNode.put("name", fieldName);
+            objectNode.put(PROPERTY_NAME, fieldName);
             var node = jsonNode.path(fieldName);
             if (node instanceof NullNode) {
                 continue;
@@ -126,7 +127,7 @@ public class PageEditorService {
             objectNode.set(VALUES, JsonNodeFactory.instance.arrayNode().add(node.asText()));
             var type = node.getNodeType().name();
             type = "NUMBER".equals(type) ? "Double" : StringUtils.capitalize(type.toLowerCase());
-            objectNode.put("type", type);
+            objectNode.put(TYPE, type);
             arrayNode.add(objectNode);
         }
         ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
@@ -245,7 +246,7 @@ public class PageEditorService {
             var attributeValue = e.attr(attribute);
             if (!attributeValue.startsWith("http")) {
                 attributeValue = "/" + StringUtils.stripStart(attributeValue, "/travel");
-                e.attr(attribute, "https://demopublic.magnolia-cms.com" + attributeValue);
+                e.attr(attribute, magnoliaPublicUrl + attributeValue);
             }
         });
     }

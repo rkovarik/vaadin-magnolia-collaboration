@@ -1,5 +1,7 @@
 package org.vaadin.addons.views.login;
 
+import static org.vaadin.addons.data.service.PageEditorService.*;
+
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -34,8 +36,8 @@ public class MagnoliaUser extends User {
     private String getString(String fieldName) {
         for (Iterator<JsonNode> it = properties.elements(); it.hasNext(); ) {
             JsonNode element = it.next();
-            if (element.path("name").asText().equals(fieldName)) {
-                return element.path("values").path(0).asText();
+            if (element.path(PROPERTY_NAME).asText().equals(fieldName)) {
+                return element.path(VALUES).path(0).asText();
             }
         }
         return null;

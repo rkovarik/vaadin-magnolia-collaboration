@@ -1,6 +1,7 @@
 package org.vaadin.addons.views.login;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.vaadin.addons.data.service.PageEditorService.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -56,7 +57,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                         .body();
 
                 JsonNode jsonNode = new ObjectMapper().reader().readValue(body, JsonNode.class);
-                return new MagnoliaUser(jsonNode.path("name").asText(), jsonNode.path("properties"), magnoliaPublicUrl);
+                return new MagnoliaUser(jsonNode.path(PROPERTY_NAME).asText(), jsonNode.path(PROPERTIES), magnoliaPublicUrl);
             } catch (IOException e) {
                 return null;
             } catch (InterruptedException e) {
