@@ -22,7 +22,6 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 public class ImageSelector extends ComboBox<JsonNode> {
 
-    public static final String JCR = "jcr:";
     private final PageEditorService pageEditorService;
 
     public ImageSelector(String magnoliaPublicUrl, PageEditorService pageEditorService) {
@@ -31,7 +30,7 @@ public class ImageSelector extends ComboBox<JsonNode> {
         setClearButtonVisible(true);
         setRenderer(new ComponentRenderer<>(item -> {
             var title = getItemLabelGenerator().apply(item);
-            var image = new Image(magnoliaPublicUrl + "/dam/" + getDataProvider().getId(item), title);
+            var image = new Image(magnoliaPublicUrl + "/.imaging/portrait/dam/" + getDataProvider().getId(item), title);
             image.setHeight(20, Unit.PIXELS);
             image.setTitle(title);
             var layout = new HorizontalLayout(new Span(title));
@@ -40,7 +39,7 @@ public class ImageSelector extends ComboBox<JsonNode> {
             }
             return layout;
         }));
-        setItemLabelGenerator(item -> item.path(PROPERTY_NAME).asText());
+        setItemLabelGenerator(item -> item.path(PROPERTIES).path(3).path(VALUES).path(0).asText());
         setItems(new DataProvider());
     }
 
@@ -54,7 +53,7 @@ public class ImageSelector extends ComboBox<JsonNode> {
 
         @Override
         public String getId(JsonNode item) {
-            return JCR + item.path(IDENTIFIER).asText();
+            return item.path(IDENTIFIER).asText();
         }
 
         @Override
@@ -76,7 +75,7 @@ public class ImageSelector extends ComboBox<JsonNode> {
             var children = jsonNode.path(NODES);
             if (children instanceof ArrayNode) {
                 children.elements().forEachRemaining(child -> collectChildren(child, assets));
-            } else {
+            } else if ("mgnl:resource".equals(jsonNode.path(TYPE).asText())) {
                 assets.put(getId(jsonNode), jsonNode);
             }
         }

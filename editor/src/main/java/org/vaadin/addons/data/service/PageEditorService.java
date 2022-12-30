@@ -78,7 +78,7 @@ public class PageEditorService {
 
     public Stream<JsonNode> getChildPages(String path, String workspace) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1 + workspace + path + "?depth=10&excludeNodeTypes=mgnl:area,rep:system,rep:AccessControl,mgnl:component,mgnl:resource"))
+                .uri(URI.create(magnoliaAuthorUrl + REST_NODES_V_1 + workspace + path + "?depth=10&excludeNodeTypes=mgnl:area,rep:system,rep:AccessControl,mgnl:component"))
                 .header(AUTHORIZATION, getMagnoliaSuperuserAuthorization())
                 .build();
         try {
