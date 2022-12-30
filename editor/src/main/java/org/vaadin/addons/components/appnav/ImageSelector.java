@@ -27,6 +27,7 @@ public class ImageSelector extends ComboBox<JsonNode> {
     public ImageSelector(String magnoliaPublicUrl, PageEditorService pageEditorService) {
         super("Image");
         this.pageEditorService = pageEditorService;
+        setPlaceholder("Select an image");
         setClearButtonVisible(true);
         setRenderer(new ComponentRenderer<>(item -> {
             var title = getItemLabelGenerator().apply(item);
@@ -53,7 +54,7 @@ public class ImageSelector extends ComboBox<JsonNode> {
 
         @Override
         public String getId(JsonNode item) {
-            return item.path(IDENTIFIER).asText();
+            return item == null ? null : item.path(IDENTIFIER).asText();
         }
 
         @Override
