@@ -34,7 +34,11 @@ public class ImageSelector extends ComboBox<JsonNode> {
             var image = new Image(magnoliaPublicUrl + "/dam/" + getDataProvider().getId(item), title);
             image.setHeight(20, Unit.PIXELS);
             image.setTitle(title);
-            return new HorizontalLayout(image, new Span(title));
+            var layout = new HorizontalLayout(new Span(title));
+            if (!title.endsWith(".mp4")) {
+                layout.addComponentAsFirst(image);
+            }
+            return layout;
         }));
         setItemLabelGenerator(item -> item.path(PROPERTY_NAME).asText());
         setItems(new DataProvider());
